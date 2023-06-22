@@ -1,5 +1,6 @@
 import init
 import numpy as np
+import random
 
 def gsl_matchup(player1, player2, df):
     """
@@ -59,6 +60,10 @@ def update_rankings_after_stage(eliminated_list, dataframe, stage_number):
     return dataframe
 
 def simulate_group(df):
+    """
+    Simulates the matches in a single group. Two players play each other, winners player each other, losers play each other. Winner of the winner match goes through.
+    Loser of the loser match goes out. The other two meet in a playoff. The winner of that playoff goes through
+    """
     df = df.sample(frac = 1)
     winner1, loser1 = gsl_matchup(df.iloc[0,2], df.iloc[1,2], df)
     winner2, loser2 = gsl_matchup(df.iloc[2,2], df.iloc[3,2], df)
@@ -68,6 +73,9 @@ def simulate_group(df):
     return [champion1, champion2, eliminated2, eliminated1]
 
 def simulate_group_round(groups):
+    """
+    Simulates all groups using the simulate_group function. Returns a list of players who advance
+    """
     next_round = []
     for group_id in groups:
         simulation_group = groups[group_id]
@@ -75,6 +83,9 @@ def simulate_group_round(groups):
     return next_round
 
 def next_round_list(next_round_list):
+    """
+    Cleans up the list of people advancing to the next round since it's a list within a list
+    """
     new_list = []
     for i in range(len(next_round_list)):
         new_list.append(next_round_list[i][0])
@@ -82,6 +93,9 @@ def next_round_list(next_round_list):
     return new_list
 
 def create_new_groups(shuffled_list):
+    """
+    Create groups from those advancing
+    """
     groups = {}
     for i in range(4):
         group_id = f"Group_{i+1}"
@@ -91,6 +105,9 @@ def create_new_groups(shuffled_list):
     return groups
 
 def simulate_round2_groups(groups_list, df):
+    """
+    Exact same methodology as simulate_one_group. However, works with lists
+    """
     winner1, loser1 = gsl_matchup(groups_list[0], groups_list[1], df)
     winner2, loser2 = gsl_matchup(groups_list[2], groups_list[3], df)
     champion1, playoff1 = gsl_matchup(winner1, winner2, df)
@@ -99,6 +116,8 @@ def simulate_round2_groups(groups_list, df):
     return [champion1, champion2, eliminated2, eliminated1]
 
 def simulate_group_round2(groups, df):
+    """Simulates the group round 2 for all groups"""
+
     next_round = []
     for group_id in groups:
         simulation_group = groups[group_id]
@@ -106,7 +125,8 @@ def simulate_group_round2(groups, df):
     return next_round
 
 def simulate_knockouts(new_list, df):
-    import random
+    "simulates knockouts"
+
     knockout_list = []
     for i in range(len(new_list)):
         knockout_list.append(new_list[i][0])
@@ -136,6 +156,7 @@ def simulate_knockouts(new_list, df):
     return df
 
 def GSL(dataframe, seeded = False):
+    "simulates the entire tournament"
     tournament_df = dataframe.copy()
     if seeded:
         results = simulate_group_round(init.create_seeded_groups(dataframe))

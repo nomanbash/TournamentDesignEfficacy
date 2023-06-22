@@ -3,29 +3,41 @@ import random
 import pandas as pd
 
 def no_seeding(player_list):
+    """
+    Simply shuffles the players and returns a list with random pairings
+    """
     random.shuffle(player_list)
-    pairings = pairings = [(player_list[i], player_list[i+1]) for i in range(0, len(player_list), 2)]
+    pairings = [(player_list[i], player_list[i+1]) for i in range(0, len(player_list), 2)]
 
     return pairings
 
 def seeding(player_list):
+    """
+    Pairs the best player with the worst, the second best with the second worst and so on. Used as a seeding mechanism
+    """
     pairings = [(player_list[i], player_list[31-i]) for i in range(0, 16, 1)]
     return pairings
 
 def swissroundone(df, seeded = False):
     players = df["Names"].to_list()
 
+
+    #initialize the dataframe we want returned
     tournament_df = df.copy()
     tournament_df["Matches"] = 0
     tournament_df["Points"] = 0
     tournament_df["Opponent Wins"] = 0
     tournament_df["Opponent Matches"] = 0
+    
 
+    #check if seeding is True or False and pair players accordingly
     if seeded:
         pairings = seeding(players)
     else:
         pairings = no_seeding(players)
 
+
+    #matchup results
     for pair in pairings:                                    
         winner, loser, wins1, wins2 = init.single_matchup(pair[0], pair[1], df)
         
@@ -36,6 +48,7 @@ def swissroundone(df, seeded = False):
         tournament_df.at[winner_index[0], "Opponents"] = loser
         tournament_df.at[loser_index[0], "Opponents"] = winner
 
+        #update metrics for each winner, loser
         tournament_df.loc[winner_index, [
             "Points",
             "Matches",
@@ -60,6 +73,9 @@ def swissroundone(df, seeded = False):
 
 
 def split_dataframe(df):
+    """
+    Splits the big dataframe into four so every player has another player to play and there are no byes. Dutch system, basically.
+    """
     df = df.sort_values(by = "Points")
     num_rows = df.shape[0]
     split_point1 = num_rows // 4

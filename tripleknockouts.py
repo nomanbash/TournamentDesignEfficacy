@@ -5,6 +5,10 @@ import numpy as np
 
 
 def triple_matchup(player1, player2, df):
+    """
+    Takes in player names and predicts the result of 3 matches, with the winner being the one who won too.
+    Return the winner, loser, winner wins and loser wins, in that order
+    """
     winner_count = [0, 0]
     for _ in range(3):
         winner = init.predict(player1, player2, df)
@@ -15,6 +19,9 @@ def triple_matchup(player1, player2, df):
         return player2, player1, winner_count[False], winner_count[True]
 
 def create_knockout_bracket(df):
+    """
+    Creates a bracket to be used as a seeding mechanism where the best player plays the worst and so on.
+    """
     bracket = [
         0,
         31,
@@ -58,6 +65,11 @@ def create_knockout_bracket(df):
     return df
 
 def knockout_stage(df, eliminated, rounds, rank_offset, seeded = False):
+    """
+    Since the knockout stage has the same format throughout, this function does all the processing for each stage.
+    The inputs are the base dataframe, the eliminated dataframe (created during round one), the rank_offset which is just the maximum rank a player could have achieved if knocked out at that round
+    Returns a dataframe of players who progress to the next round, and another dataframe of players who have been eliminated
+    """
     winners = pd.DataFrame()
     if seeded:
         if rounds == 32:
@@ -88,10 +100,17 @@ def knockout_stage(df, eliminated, rounds, rank_offset, seeded = False):
 
 
 def tripleknockouts(df, seeded = False):
+    """
+    Calls the previous function repeatedly a number of times based on the knockout stage before calculating metrics and returning them
+    """
+
+    #initialization
     eliminated = pd.DataFrame()
     eliminated["Post-Rankings"] = np.nan
     df = df.copy()
     df[["Wins", "Matches Played"]] = 0
+    
+    #call each round iteratively. Finally, add the champion (since they're not added to the eliminated df)
     winners, eliminated = knockout_stage(df, eliminated, 32, 16, seeded)
     winners, eliminated = knockout_stage(winners, eliminated, 16, 8, seeded)
     semifinalists, eliminated = knockout_stage(winners, eliminated, 8, 4, seeded)

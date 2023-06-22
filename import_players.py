@@ -57,6 +57,8 @@ for player in players:
     player_ids.append(data["players"][0]["id"])
     player_names.append(player.split()[0])
 
+
+#sometimes the webpage has a different format, this checks if any players were gotten at all, and if not, uses a different methodology to extract players
 if player_ids:
     pass
 else:
@@ -109,7 +111,7 @@ else:
 zipped = list(zip(player_ids, player_names))
 players_df = pd.DataFrame(zipped, columns = ['IDs','Names'])
 
-# Set up the API endpoint and your API key
+# Set up the API endpoint and API key
 api_key = config.API_KEY
 searchablestring = ";".join([str(player_id) for player_id in player_ids])
 

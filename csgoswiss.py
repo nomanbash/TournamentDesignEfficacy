@@ -13,23 +13,30 @@ def csgo_swissround(df: pd.DataFrame):
     """
 
 
-
+    #random shuffling
     players = df["Names"].to_list()
     random.shuffle(players)
 
     tournament_df = df.copy()
 
+    #create matchups
     pairings = [(players[i], players[i+1]) for i in range(0, len(players), 2) if players[i+1] not in df["Opponents"]]
 
+    #play matches
     for pair in pairings:
+
+        #predict winner
         winner, loser, onewins, twowins = init.single_matchup(pair[0], pair[1], df)
 
+
+        #update winner and add the opponent played to their Opponents list so they're not played again
         winner_index = tournament_df.index[tournament_df["Names"] == winner]
         loser_index = tournament_df.index[tournament_df["Names"] == loser]
 
         tournament_df.loc[winner_index, ["Points", "Opponent Wins", "Matches", "Opponents"]] += onewins, twowins, 1, ", " + loser
         tournament_df.loc[loser_index, ["Points", "Opponent Wins", "Matches", "Opponents"]] += twowins, onewins, 1, ", " + winner
 
+        #calculate OMW%
         tournament_df.loc[winner_index, "OMW%"] = tournament_df["Opponent Wins"] / tournament_df["Matches"]
         tournament_df.loc[loser_index, "OMW%"] = tournament_df["Opponent Wins"] / tournament_df["Matches"]
 

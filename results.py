@@ -4,8 +4,6 @@ import importlib.util
 import pandas as pd
 import sys
 
-sys.setrecursionlimit(9000)
-
 data_folder = 'Data'
 results_folder = 'Results'
 num_iterations = 1000
