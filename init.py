@@ -4,6 +4,15 @@ import random
 import math
 
 def main():
+    """
+    Predicts the outcome of a match between two players given their ratings in a particular year.
+    Only runs when init.py is run directly from the terminal.
+
+    Player names are inputted as strings. Dataframe from which their rankings is written in the form 20XXGSL
+
+    """
+
+
     players_df = load()
     player1 = input("Enter Player 1: ")
     player2 = input("Enter Player 2: ")
@@ -11,17 +20,34 @@ def main():
 
 
 def load():
+    """
+    Loads a dataframe with player rankings. Data file is in the format 20XXGSL
+    """
     file_path = "Data/" + input("Enter file name: ") + ".csv"
     players_df = pd.read_csv(file_path)
     return players_df
 
 
+def sample_logistic(variance):
+    """
+    Samples a player's rating based on their official rating and their standard deviation or volatility from a normal curve
+    """
+    u = np.random.uniform()
+    return math.sqrt(3 * variance) * (math.log(u / (1 - u)))
+
     
 def logistic(rating_diff):
+    """
+    Takes in the rating difference between two players and returns the value of the cumulative logistic distribution function with that rating difference
+    """
+
     return 1 / (1 + math.exp(-rating_diff))
 
     
 def predict(player1, player2, df):
+    """
+    Given two player names, inputted as string, returns the winner's name
+    """
     player_a, player_b = df[df["Names"] == player1]["ratings"].values[0], df[df["Names"] == player2]["ratings"].values[0]
     #variance_a, variance_b = df[df["Names"] == player1]["deviation"].values, df[df["Names"] == player2]["deviation"].values
 
@@ -34,7 +60,11 @@ def predict(player1, player2, df):
     return player1 if random.random() <= winrate else player2
 
     
-def calculate_metrics(df):
+def calculate_metrics(df: pd.DataFrame):
+    """
+    Calculates, and returns, the weighted inversion, number of inversions, finishing position of the first player, 
+    finishing position of the last player given a dataframe with post-rankings and pre-rank
+    """
     filtered_df = df.copy()
     prerank = round(filtered_df["Pre-Rank"],0).astype(int).to_list()
     postrank = round(filtered_df["Post-Rankings"],0).astype(int).to_list()
@@ -57,6 +87,9 @@ def calculate_metrics(df):
 
     
 def calculate_running_mean(arr):
+    """
+    Takes in a list of values and returns the running mean
+    """
     running_means = []
     current_sum = 0
     for i, num in enumerate(arr, 1):
@@ -68,6 +101,10 @@ def calculate_running_mean(arr):
     
         
 def create_seeded_groups(df):
+    """
+    Creates 8 groups of 4 players each with the players 1, 5, 9, 13 in one group;
+    2, 6, 10, 14 in the second group and so on.
+    """
     groups = {}
     for i in range(8):
         group_id = f"Group_{i+1}"
@@ -80,7 +117,10 @@ def create_seeded_groups(df):
 
     
 
-def create_groups(df):
+def create_groups(df: pd.DataFrame) -> dict: 
+    """
+    Creates 8 groups of 4 players each randomly
+    """
     df = df.sample(frac = 1)
     groups = {}
     for i in range(8):
@@ -91,7 +131,11 @@ def create_groups(df):
     return groups
 
 
-def single_matchup(player1, player2, df):
+def single_matchup(player1: str, player2: str, df: str):
+    """
+    A single matchup. Takes in player names as string, as well as a dataframe where the rankings are.
+    Returns the winner name, followed by the loser name, followed by the wins of winner and loser
+    """
     winner = predict(player1, player2, df)
     if winner == player1:
         return player1, player2, 1, 0
@@ -100,6 +144,9 @@ def single_matchup(player1, player2, df):
 
 
 def random_draw(df):
+    """
+    Creates a random draw for knockouts
+    """
     num_teams = len(df)
     
     # Create a copy of the DataFrame to store the draw results
@@ -130,10 +177,6 @@ def random_draw(df):
     draw_df = draw_df.sample(frac=1).reset_index(drop=True)
     
     return draw_df
-
-
-
-
 
 
 if __name__ == "__main__":

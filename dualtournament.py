@@ -5,6 +5,9 @@ import random
 
     
 def matchupdt(player1, player2, df):
+    """
+    Uses the predict function from init.py to predict the outcome of a matchup. Requires the main dataframe where ratings are stored
+    """
     winner = init.predict(player1, player2, df)
     if winner == player1:
         return player1, player2
@@ -12,12 +15,18 @@ def matchupdt(player1, player2, df):
         return player2, player1
 
 def random_shuffling(df):
+    """
+    Creates a shuffled list of players.
+    """
     players = df["Names"].to_list()
     random.shuffle(players)
 
     return players
 
-def seeded_shuffling(df):
+def seeded_shuffling(df: pd.DataFrame) -> list:
+    """
+    Creates a bracket which approximates the draws used in seeded knockout tournaments and then assigns players to that bracket
+    """
     bracket = [
         0,
         31,
@@ -60,6 +69,9 @@ def seeded_shuffling(df):
     return players
 
 def dualtournamentsetup(df, player_list):
+    """
+    Uses a bracket system to conduct the tournament. 
+    """
     players = player_list.copy()
     winner = [None] * 62
     loser = [None] * 62
@@ -175,6 +187,9 @@ def dualtournamentsetup(df, player_list):
     return losers_df
 
 def dualtournament(df, seeded = False):
+    """
+    Takes in a df and outputs the metrics required for the research.
+    """
     if seeded:
         players = seeded_shuffling(df)
     else:

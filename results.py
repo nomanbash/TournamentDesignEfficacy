@@ -20,6 +20,7 @@ functions = {
     'swiss': {'module': 'swiss', 'seeded': False},
     'multistage': {'module': 'multistage', 'seeded': False},
     'dualtournament': {'module': 'dualtournament', 'seeded': False}
+    #add others as necessary
 }
 
 os.makedirs(results_folder, exist_ok=True)

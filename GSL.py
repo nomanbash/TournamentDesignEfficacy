@@ -2,6 +2,9 @@ import init
 import numpy as np
 
 def gsl_matchup(player1, player2, df):
+    """
+    Uses the predict function to decide the winner across three matches
+    """
     winner_count = [0, 0]
     for _ in range(3):
         winner = init.predict(player1, player2, df)
@@ -33,6 +36,9 @@ def gsl_matchupfinals(player1, player2, df):
         return player2, player1
 
 def update_rankings_after_stage(eliminated_list, dataframe, stage_number):
+    """
+    Adds rankings to players that were eliminated from the tournament
+    """
     new_list = [item for sublist in eliminated_list for item in sublist[2:4]]
 
     conditions = [

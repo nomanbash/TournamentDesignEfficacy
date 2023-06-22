@@ -6,7 +6,14 @@ import swiss
 import tripleknockouts
 
 
-def csgo_swissround(df):
+def csgo_swissround(df: pd.DataFrame):
+    """
+    Takes in a pre-generated datafrom made from import_player.py and runs a Swiss round. Calculates Points and Opponent Match Win % adding them to the dataframe.
+    Returns a dataframe with these added values
+    """
+
+
+
     players = df["Names"].to_list()
     random.shuffle(players)
 
@@ -31,6 +38,11 @@ def csgo_swissround(df):
     return tournament_df
 
 def csgoswiss_roundtwo(df):
+    """
+    Runs the second round of a CSGO Swiss Tournament. Separates players into two groups; one with winners and one with losers.
+    Runs csgo_swissround on it before concatenating the two resulting dataframes. Returns a dataframe with the second round completed
+    """
+
     df = df.sort_values(by = "Points")
     top_bracket = df.head(16).copy()
     bottom_bracket = df.tail(16).copy()
@@ -43,6 +55,11 @@ def csgoswiss_roundtwo(df):
     return df
 
 def csgo_swissround3(df):
+    """
+    Third round of the CSGO Style Swiss Tournament
+    """
+
+
     eliminator = df[df["Points"] == 0].copy()
     middle = df[df["Points"] == 1].copy()
     top = df[df["Points"] == 2].copy()
@@ -56,6 +73,9 @@ def csgo_swissround3(df):
     return df
 
 def csgo_swissroundfour(df):
+    """
+    Fourth round of the CSGO Style Swiss Tournament
+    """
     qualified = df[df["Points"] == 3].copy()
     eliminated = df[df["Points"] == 0].copy()
     top = df[df["Points"] == 2].copy()
@@ -69,6 +89,9 @@ def csgo_swissroundfour(df):
     return df
 
 def csgo_swissroundfive(df):
+    """
+    Fifth round of the CSGO Style Swiss Tournament
+    """
     qualified = df[df["Points"] == 3].copy()
     eliminated = df[df["Points"] <= 1].copy()
     top = df[df["Points"] == 2].copy()
@@ -80,6 +103,9 @@ def csgo_swissroundfive(df):
     return df
 
 def csgo_swissroundsix(df):
+    """
+    Sixth and final round of the CSGO Tournament
+    """
     eliminated = df[df["Points"] < 3].copy()
 
     eliminated.reset_index(inplace = True, drop = True)
@@ -168,6 +194,9 @@ def csgo_swissroundsix(df):
     return eliminated
         
 def csgoswiss(df, seeded = False):
+    """
+    Complete tournament
+    """
     df = swiss.swissroundone(df, seeded)
     df = csgoswiss_roundtwo(df)
     df = csgo_swissround3(df)
