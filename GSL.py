@@ -184,7 +184,6 @@ def main():
     print()
     print("Seeded")
     print()
-    prin()
 
     inversion_metrics, number_inversions, Top1, TopK = GSL(df, seeded=True)
     print(f"The weighted inversions were {inversion_metrics:.2f}")
